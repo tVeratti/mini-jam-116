@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://djjwoly0lg2ex"]
+
+[ext_resource type="PackedScene" uid="uid://cpxuo0thsp7uw" path="res://Tiles/Ground.tscn" id="1_qul8k"]
+
+[sub_resource type="GDScript" id="GDScript_611nk"]
+script/source = "extends Node2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_xoom4"]
+resource_name = "ground"
+scenes/1/scene = ExtResource("1_qul8k")
+
+[sub_resource type="TileSet" id="TileSet_lrdlk"]
+tile_size = Vector2i(100, 100)
+sources/0 = SubResource("TileSetScenesCollectionSource_xoom4")
+
+[node name="Map" type="Node2D"]
+script = SubResource("GDScript_611nk")
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_lrdlk")
+format = 2
+layer_0/tile_data = PackedInt32Array(65535, 0, 65536, 0, 0, 65536, -65536, 0, 65536, -1, 0, 65536)
+
+[node name="Camera2d" type="Camera2D" parent="."]
+current = true
+smoothing_enabled = true
