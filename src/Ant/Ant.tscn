@@ -1,0 +1,126 @@
+[gd_scene load_steps=7 format=3 uid="uid://cw3jgmdvqccsy"]
+
+[ext_resource type="Texture2D" uid="uid://q523d265jp0j" path="res://Ant/ant_sprites.png" id="1_4r3po"]
+[ext_resource type="Texture2D" uid="uid://cp34c6nx7ee7s" path="res://Ant/arrow.png" id="2_53wsx"]
+
+[sub_resource type="GDScript" id="GDScript_wdhd2"]
+script/source = "extends Node2D
+
+
+const SPEED:float = 1.0
+const SIZE:float = 100.0
+
+
+var _path:Array = []
+
+
+var id:String
+var intended_direction:Vector2i = Vector2i.ZERO
+var target_position:Vector2 = Vector2.ZERO
+var is_moving:bool = false
+
+@onready var sprite:AnimatedSprite2D = $AnimatedSprite2d
+@onready var direction_arrow:Sprite2D = $Direction
+
+
+func _ready():
+	TurnManager.on_input_phase_start.connect(self._on_input_start)
+	TurnManager.on_resolve_phase_start.connect(self._resolve_movement)
+
+
+func _process(delta):
+	handle_movement(delta)
+	handle_input()
+
+
+func handle_input():
+	if TurnManager.phase == TurnManager.Phases.INPUT:
+		var new_direction:Vector2 =  Vector2.ZERO
+		
+		if Input.is_action_just_pressed(\"ui_left\"):
+			new_direction = Vector2.LEFT
+			
+		if Input.is_action_just_pressed(\"ui_right\"):
+			new_direction = Vector2.RIGHT
+			
+		if Input.is_action_just_pressed(\"ui_up\"):
+			new_direction = Vector2.UP
+			
+		if Input.is_action_just_pressed(\"ui_down\"):
+			new_direction = Vector2.DOWN
+		
+		if new_direction != Vector2.ZERO:
+			intended_direction = new_direction
+			render_direction()
+
+
+func handle_movement(delta:float):
+	if target_position != Vector2.ZERO:
+		if target_position.distance_to(position) > 1:
+			if !sprite.playing: sprite.play()
+			is_moving = true
+			position = Vector2(
+				lerp(position.x, target_position.x, delta * SPEED),
+				lerp(position.y, target_position.y, delta * SPEED)
+			)
+		else:
+			sprite.stop()
+			is_moving = false
+			target_position = Vector2.ZERO
+
+
+func render_direction():
+	direction_arrow.flip_h = false
+	direction_arrow.rotation = 0
+	
+	match(intended_direction):
+		Vector2i.LEFT:
+			direction_arrow.flip_h = true
+		Vector2i.RIGHT:
+			direction_arrow.flip_h = false
+		Vector2i.UP:
+			direction_arrow.rotation = deg_to_rad(-90)
+		Vector2i.DOWN:
+			direction_arrow.rotation = deg_to_rad(90)
+	
+	direction_arrow.position = intended_direction * SIZE
+
+
+
+func _resolve_movement():
+	direction_arrow.hide()
+	
+	var target_coord:Vector2i = MapManager.tilemap.local_to_map(position) + intended_direction
+	var target_local:Vector2 = MapManager.tilemap.map_to_local(target_coord)
+	target_position = target_local
+
+
+func _on_input_start():
+	direction_arrow.show()
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_heqow"]
+atlas = ExtResource("1_4r3po")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iku5o"]
+atlas = ExtResource("1_4r3po")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pk0a2"]
+animations = [{
+"frames": [SubResource("AtlasTexture_heqow"), SubResource("AtlasTexture_iku5o")],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Ant" type="Node2D"]
+script = SubResource("GDScript_wdhd2")
+
+[node name="AnimatedSprite2d" type="AnimatedSprite2D" parent="."]
+frames = SubResource("SpriteFrames_pk0a2")
+frame = 1
+
+[node name="Direction" type="Sprite2D" parent="."]
+texture = ExtResource("2_53wsx")

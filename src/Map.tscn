@@ -6,14 +6,15 @@
 script/source = "extends Node2D
 
 
-# Called when the node enters the scene tree for the first time.
+@onready var tilemap:TileMap = $TileMap
+
+
 func _ready():
-	pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+	MapManager.tilemap = tilemap
+	
+	var new_ant = AntManager.add()
+	add_child(new_ant)
+	new_ant.position = MapManager.tilemap.map_to_local(Vector2i.ZERO)
 "
 
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_xoom4"]

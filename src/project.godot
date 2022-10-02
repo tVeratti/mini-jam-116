@@ -11,9 +11,21 @@ config_version=5
 [application]
 
 config/name="Src"
+run/main_scene="res://Map.tscn"
 config/features=PackedStringArray("4.0", "Vulkan Clustered")
 config/icon="res://icon.svg"
 
 [autoload]
 
 TurnManager="*res://TurnManager.gd"
+AntManager="*res://AntManager.gd"
+MapManager="*res://MapManager.gd"
+
+[display]
+
+window/dpi/allow_hidpi=false
+
+[rendering]
+
+textures/default_filters/use_nearest_mipmap_filter=true
+textures/canvas_textures/default_texture_filter=0
